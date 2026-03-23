@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>CoachSync — Raj Kumar</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0F1117;
+  --surface: #1A1D27;
+  --surface2: #22263A;
+  --surface3: #2A2F45;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.13);
+  --text: #F0F2FF;
+  --text2: #8B90A8;
+  --text3: #555A70;
+  --accent: #6C63FF;
+  --accent2: #8B84FF;
+  --accent-glow: rgba(108,99,255,0.18);
+  --green: #22C55E;
+  --green-bg: rgba(34,197,94,0.12);
+  --amber: #F59E0B;
+  --amber-bg: rgba(245,158,11,0.12);
+  --red: #EF4444;
+  --red-bg: rgba(239,68,68,0.12);
+  --teal: #14B8A6;
+  --teal-bg: rgba(20,184,166,0.12);
+  --r: 14px;
+  --r-sm: 9px;
+  --font: 'Plus Jakarta Sans', sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overscroll-behavior:none;}
+
+/* ── BOTTOM NAV ── */
+.app{display:flex;flex-direction:column;min-height:100vh;}
+.main-content{flex:1;padding:0 0 80px 0;overflow-y:auto;}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom);}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 0 8px;border:none;background:none;color:var(--text3);font-family:var(--font);font-size:10px;font-weight:500;cursor:pointer;transition:color 0.2s;letter-spacing:0.02em;}
+.nav-btn.active{color:var(--accent2);}
+.nav-btn svg{width:20px;height:20px;transition:transform 0.2s;}
+.nav-btn.active svg{transform:scale(1.1);}
+
+/* ── PAGES ── */
+.page{display:none;padding:0;}
+.page.active{display:block;}
+
+/* ── HEADER ── */
+.page-header{padding:20px 20px 16px;position:sticky;top:0;background:var(--bg);z-index:10;border-bottom:1px solid var(--border);}
+.page-header-inner{display:flex;justify-content:space-between;align-items:center;}
+.page-title{font-size:22px;font-weight:700;letter-spacing:-0.02em;}
+.page-sub{font-size:13px;color:var(--text2);margin-top:2px;}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:var(--r-sm);font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);transition:all 0.15s;letter-spacing:0.01em;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:var(--accent2);}
+.btn-ghost{background:var(--surface2);color:var(--text2);border:1px solid var(--border2);}
+.btn-ghost:hover{background:var(--surface3);}
+.btn-sm{padding:6px 13px;font-size:12px;}
+.btn-icon{width:36px;height:36px;padding:0;border-radius:var(--r-sm);justify-content:center;}
+
+/* ── CARDS ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;}
+.card+.card{margin-top:10px;}
+
+/* ── METRICS ROW ── */
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px 16px 0;}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;}
+.metric-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:5px;font-weight:600;}
+.metric-val{font-size:26px;font-weight:700;letter-spacing:-0.03em;}
+.metric-sub{font-size:11px;color:var(--text2);margin-top:3px;}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:0.02em;}
+.badge-green{background:var(--green-bg);color:var(--green);}
+.badge-amber{background:var(--amber-bg);color:var(--amber);}
+.badge-red{background:var(--red-bg);color:var(--red);}
+.badge-accent{background:var(--accent-glow);color:var(--accent2);}
+.badge-teal{background:var(--teal-bg);color:var(--teal);}
+
+/* ── SECTION ── */
+.section{padding:16px 16px 0;}
+.section-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;}
+
+/* ── BATCH CARD ── */
+.batch-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:10px;cursor:pointer;transition:border-color 0.2s;}
+.batch-card:hover{border-color:var(--border2);}
+.batch-card-top{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.batch-icon{width:42px;height:42px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.batch-name{font-size:15px;font-weight:600;letter-spacing:-0.01em;}
+.batch-loc{font-size:12px;color:var(--text2);margin-top:2px;}
+.batch-meta{display:flex;gap:8px;flex-wrap:wrap;}
+.meta-chip{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--text2);font-weight:500;}
+.progress-bar{height:4px;background:var(--surface3);border-radius:4px;margin-top:12px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:4px;background:var(--accent);transition:width 0.5s;}
+
+/* ── STUDENT ROW ── */
+.student-row{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border);}
+.student-row:last-child{border-bottom:none;}
+.ava{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+.student-info{flex:1;min-width:0;}
+.student-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.student-detail{font-size:12px;color:var(--text2);margin-top:1px;}
+.student-fee{text-align:right;flex-shrink:0;}
+.fee-amt{font-size:13px;font-weight:600;}
+.fee-label{font-size:11px;color:var(--text3);margin-top:1px;}
+
+/* ── ATTENDANCE ── */
+.att-controls{padding:16px;display:flex;flex-direction:column;gap:10px;}
+.att-select{width:100%;padding:12px 14px;border-radius:var(--r-sm);border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-family:var(--font);font-size:14px;outline:none;}
+.att-select:focus{border-color:var(--accent);}
+.att-date-row{display:flex;gap:8px;align-items:center;}
+.att-date{flex:1;padding:12px 14px;border-radius:var(--r-sm);border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-family:var(--font);font-size:14px;outline:none;}
+.att-date:focus{border-color:var(--accent);}
+.att-save{flex-shrink:0;}
+.att-grid{padding:0 16px 16px;display:flex;flex-direction:column;gap:8px;}
+.att-student{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);cursor:pointer;transition:all 0.15s;}
+.att-student.present{border-color:var(--green);background:var(--green-bg);}
+.att-student.absent{border-color:var(--red);background:var(--red-bg);}
+.att-toggle{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s;}
+.present .att-toggle{background:var(--green);border-color:var(--green);color:#fff;}
+.absent .att-toggle{background:var(--red);border-color:var(--red);color:#fff;}
+
+/* ── FEE TABLE ── */
+.fee-list{padding:0 16px;}
+.fee-row{display:flex;align-items:center;gap:10px;padding:13px 0;border-bottom:1px solid var(--border);}
+.fee-row:last-child{border-bottom:none;}
+.fee-info{flex:1;min-width:0;}
+.fee-name{font-size:14px;font-weight:600;}
+.fee-batch{font-size:12px;color:var(--text2);margin-top:1px;}
+.fee-right{text-align:right;flex-shrink:0;}
+.fee-balance{font-size:14px;font-weight:700;}
+.fee-collect{margin-top:4px;}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:flex-end;justify-content:center;padding:0;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border-radius:var(--r) var(--r) 0 0;padding:20px;width:100%;max-height:90vh;overflow-y:auto;animation:slideUp 0.25s ease;}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:36px;height:4px;background:var(--surface3);border-radius:2px;margin:0 auto 18px;}
+.modal-title{font-size:18px;font-weight:700;margin-bottom:18px;letter-spacing:-0.02em;}
+.form-group{margin-bottom:14px;}
+.form-label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em;}
+.form-input{width:100%;padding:12px 14px;border-radius:var(--r-sm);border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-family:var(--font);font-size:14px;outline:none;transition:border 0.15s;}
+.form-input:focus{border-color:var(--accent);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.modal-actions{display:flex;gap:8px;margin-top:18px;}
+.modal-actions .btn{flex:1;justify-content:center;}
+
+/* ── DASHBOARD HERO ── */
+.dash-hero{padding:20px;background:linear-gradient(135deg,var(--surface) 0%,var(--surface2) 100%);border-bottom:1px solid var(--border);margin-bottom:4px;}
+.dash-greeting{font-size:13px;color:var(--text2);margin-bottom:4px;}
+.dash-name{font-size:24px;font-weight:700;letter-spacing:-0.03em;}
+.dash-date{font-size:12px;color:var(--text3);margin-top:3px;}
+
+/* ── TODAY SESSION ── */
+.session-card{display:flex;align-items:center;gap:12px;padding:13px 14px;background:var(--surface2);border-radius:var(--r-sm);margin-bottom:8px;border:1px solid var(--border);}
+.session-time{font-size:12px;font-weight:700;color:var(--accent2);width:48px;flex-shrink:0;text-align:center;}
+.session-info{flex:1;}
+.session-name{font-size:13px;font-weight:600;}
+.session-loc{font-size:11px;color:var(--text3);margin-top:2px;}
+
+/* ── ALERT ROW ── */
+.alert-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--border);}
+.alert-row:last-child{border-bottom:none;}
+.alert-name{font-size:13px;font-weight:600;}
+.alert-batch{font-size:11px;color:var(--text3);margin-top:1px;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:95px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--green);color:#fff;padding:10px 20px;border-radius:30px;font-size:13px;font-weight:600;opacity:0;transition:all 0.3s;z-index:300;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:40px 20px;color:var(--text3);}
+.empty-icon{font-size:32px;margin-bottom:10px;}
+.empty-title{font-size:15px;font-weight:600;color:var(--text2);margin-bottom:4px;}
+
+/* ── FAB ── */
+.fab{position:fixed;bottom:90px;right:20px;width:52px;height:52px;border-radius:50%;background:var(--accent);border:none;color:#fff;font-size:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(108,99,255,0.4);z-index:50;transition:transform 0.15s;}
+.fab:hover{transform:scale(1.05);}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="main-content">
+
+    <!-- ── DASHBOARD ── -->
+    <div class="page active" id="page-dashboard">
+      <div class="dash-hero">
+        <div class="dash-greeting">Welcome back 👋</div>
+        <div class="dash-name">Raj Kumar</div>
+        <div class="dash-date" id="dash-date"></div>
+      </div>
+
+      <div class="metrics">
+        <div class="metric">
+          <div class="metric-label">Students</div>
+          <div class="metric-val" id="m-students">0</div>
+          <div class="metric-sub">across all batches</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Batches</div>
+          <div class="metric-val" id="m-batches">0</div>
+          <div class="metric-sub">active locations</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Collected</div>
+          <div class="metric-val" id="m-collected" style="color:var(--green)">₹0</div>
+          <div class="metric-sub">this month</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Pending</div>
+          <div class="metric-val" id="m-pending" style="color:var(--amber)">₹0</div>
+          <div class="metric-sub" id="m-pending-sub">due</div>
+        </div>
+      </div>
+
+      <div class="section" style="margin-top:16px;">
+        <div class="section-label">Today's sessions</div>
+        <div id="today-sessions"></div>
+      </div>
+
+      <div class="section" style="margin-top:8px;">
+        <div class="section-label">Fee alerts</div>
+        <div class="card" style="padding:4px 16px;" id="fee-alerts"></div>
+      </div>
+    </div>
+
+    <!-- ── BATCHES ── -->
+    <div class="page" id="page-batches">
+      <div class="page-header">
+        <div class="page-header-inner">
+          <div><div class="page-title">Batches</div><div class="page-sub">Your teaching locations</div></div>
+        </div>
+      </div>
+      <div style="padding:16px;" id="batch-list"></div>
+    </div>
+
+    <!-- ── STUDENTS ── -->
+    <div class="page" id="page-students">
+      <div class="page-header">
+        <div class="page-header-inner">
+          <div><div class="page-title">Students</div><div class="page-sub" id="students-sub">All students</div></div>
+        </div>
+      </div>
+      <div style="padding:16px 16px 0;">
+        <select class="att-select" id="student-filter" onchange="filterStudents()">
+          <option value="">All batches</option>
+        </select>
+      </div>
+      <div class="card" style="margin:16px;padding:4px 16px;" id="students-list"></div>
+    </div>
+
+    <!-- ── ATTENDANCE ── -->
+    <div class="page" id="page-attendance">
+      <div class="page-header">
+        <div class="page-header-inner">
+          <div><div class="page-title">Attendance</div><div class="page-sub">Mark today's session</div></div>
+        </div>
+      </div>
+      <div class="att-controls">
+        <select class="att-select" id="att-batch" onchange="renderAttGrid()">
+          <option value="">Select batch...</option>
+        </select>
+        <div class="att-date-row">
+          <input type="date" class="att-date" id="att-date" onchange="renderAttGrid()"/>
+          <button class="btn btn-primary att-save btn-sm" onclick="saveAtt()">Save ✓</button>
+        </div>
+        <div id="att-summary" style="display:none;font-size:13px;color:var(--text2);"></div>
+      </div>
+      <div class="att-grid" id="att-grid"></div>
+    </div>
+
+    <!-- ── FEES ── -->
+    <div class="page" id="page-fees">
+      <div class="page-header">
+        <div class="page-header-inner">
+          <div><div class="page-title">Fees</div><div class="page-sub">Collections & dues</div></div>
+        </div>
+      </div>
+      <div class="metrics" style="padding:16px 16px 0;">
+        <div class="metric" style="grid-column:1/3;display:flex;justify-content:space-around;">
+          <div style="text-align:center;">
+            <div class="metric-label">Collected</div>
+            <div class="metric-val" id="f-collected" style="color:var(--green)">₹0</div>
+          </div>
+          <div style="width:1px;background:var(--border);"></div>
+          <div style="text-align:center;">
+            <div class="metric-label">Pending</div>
+            <div class="metric-val" id="f-pending" style="color:var(--amber)">₹0</div>
+          </div>
+          <div style="width:1px;background:var(--border);"></div>
+          <div style="text-align:center;">
+            <div class="metric-label">Total</div>
+            <div class="metric-val" id="f-total">₹0</div>
+          </div>
+        </div>
+      </div>
+      <div class="fee-list" style="margin-top:16px;" id="fees-list"></div>
+    </div>
+
+  </div>
+
+  <!-- FAB -->
+  <button class="fab" id="fab" onclick="openFab()">+</button>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="showPage('dashboard',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </button>
+    <button class="nav-btn" onclick="showPage('batches',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+      Batches
+    </button>
+    <button class="nav-btn" onclick="showPage('students',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Students
+    </button>
+    <button class="nav-btn" onclick="showPage('attendance',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Attendance
+    </button>
+    <button class="nav-btn" onclick="showPage('fees',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      Fees
+    </button>
+  </nav>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+
+  <!-- ADD BATCH -->
+  <div class="modal" id="modal-batch" style="display:none">
+    <div class="modal-handle"></div>
+    <div class="modal-title">New Batch</div>
+    <div class="form-group"><label class="form-label">Batch name</label><input class="form-input" id="b-name" placeholder="e.g. Morning Yoga — Bandra"/></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Discipline</label>
+        <select class="form-input" id="b-type"><option>Yoga</option><option>Sound Therapy</option><option>Meditation</option><option>Pilates</option><option>Dance</option><option>Other</option></select>
+      </div>
+      <div class="form-group"><label class="form-label">Time</label><input class="form-input" type="time" id="b-time" value="07:00"/></div>
+    </div>
+    <div class="form-group"><label class="form-label">Location</label><input class="form-input" id="b-loc" placeholder="Bandra West, Mumbai"/></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Days</label><input class="form-input" id="b-days" placeholder="Mon, Wed, Fri"/></div>
+      <div class="form-group"><label class="form-label">Capacity</label><input class="form-input" type="number" id="b-cap" placeholder="8"/></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveBatch()">Create</button>
+    </div>
+  </div>
+
+  <!-- ADD STUDENT -->
+  <div class="modal" id="modal-student" style="display:none">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Add Student</div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Full name</label><input class="form-input" id="s-name" placeholder="Name"/></div>
+      <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="s-phone" placeholder="98765 43210"/></div>
+    </div>
+    <div class="form-group"><label class="form-label">Batch</label><select class="form-input" id="s-batch"></select></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Fee type</label>
+        <select class="form-input" id="s-fee-type"><option value="monthly">Monthly</option><option value="per-session">Per session</option></select>
+      </div>
+      <div class="form-group"><label class="form-label">Amount (₹)</label><input class="form-input" type="number" id="s-fee" placeholder="1500"/></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveStudent()">Add</button>
+    </div>
+  </div>
+
+  <!-- RECORD PAYMENT -->
+  <div class="modal" id="modal-pay" style="display:none">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Record Payment</div>
+    <div class="form-group"><label class="form-label">Student</label><select class="form-input" id="p-student"></select></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Amount (₹)</label><input class="form-input" type="number" id="p-amount" placeholder="1500"/></div>
+      <div class="form-group"><label class="form-label">Date</label><input class="form-input" type="date" id="p-date"/></div>
+    </div>
+    <div class="form-group"><label class="form-label">Note</label><input class="form-input" id="p-note" placeholder="March fees, UPI..."/></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="savePay()">Save</button>
+    </div>
+  </div>
+
+  <!-- FAB MENU -->
+  <div class="modal" id="modal-fab" style="display:none">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Add New</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button class="btn btn-ghost" style="justify-content:flex-start;font-size:14px;padding:14px 16px;" onclick="closeModal();openModal('batch')">📍 &nbsp; New Batch</button>
+      <button class="btn btn-ghost" style="justify-content:flex-start;font-size:14px;padding:14px 16px;" onclick="closeModal();openModal('student')">👤 &nbsp; Add Student</button>
+      <button class="btn btn-ghost" style="justify-content:flex-start;font-size:14px;padding:14px 16px;" onclick="closeModal();openModal('pay')">💰 &nbsp; Record Payment</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ICONS = {Yoga:'🧘',  'Sound Therapy':'🔔', Meditation:'🌙', Pilates:'💪', Dance:'💃', Other:'📍'};
+const COLORS = ['#6C63FF','#14B8A6','#F59E0B','#EF4444','#22C55E','#EC4899','#8B5CF6'];
+const AVA_BG = ['rgba(108,99,255,0.2)','rgba(20,184,166,0.2)','rgba(245,158,11,0.2)','rgba(239,68,68,0.2)','rgba(34,197,94,0.2)','rgba(236,72,153,0.2)'];
+
+let S = { batches:[], students:[], payments:[], attendance:{} };
+let attState = {};
+
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,5); }
+function save(){ try{localStorage.setItem('cs2',JSON.stringify(S));}catch(e){} }
+function load(){ try{ const d=localStorage.getItem('cs2'); if(d) S=JSON.parse(d); }catch(e){} }
+
+function initSeed(){
+  if(S.batches.length) return;
+  S.batches=[
+    {id:'b1',name:'Morning Yoga',type:'Yoga',time:'06:30',location:'Bandra West',days:'Mon–Sat',capacity:8},
+    {id:'b2',name:'Evening Yoga',type:'Yoga',time:'18:00',location:'Juhu Beach',days:'Mon, Wed, Fri',capacity:10},
+    {id:'b3',name:'Sound Therapy',type:'Sound Therapy',time:'10:00',location:'Andheri East',days:'Tue, Thu, Sat',capacity:6},
+    {id:'b4',name:'Corporate Yoga',type:'Yoga',time:'08:00',location:'BKC, Mumbai',days:'Mon–Fri',capacity:12},
+  ];
+  S.students=[
+    {id:'s1',name:'Priya Sharma',phone:'98201 11234',batchId:'b1',feeType:'monthly',feeAmount:2500},
+    {id:'s2',name:'Anil Mehta',phone:'97308 22341',batchId:'b1',feeType:'monthly',feeAmount:2500},
+    {id:'s3',name:'Kavita Rao',phone:'96207 33452',batchId:'b1',feeType:'monthly',feeAmount:2500},
+    {id:'s4',name:'Suresh Nair',phone:'95106 44563',batchId:'b2',feeType:'monthly',feeAmount:2000},
+    {id:'s5',name:'Meena Patel',phone:'94005 55674',batchId:'b2',feeType:'monthly',feeAmount:2000},
+    {id:'s6',name:'Ritu Joshi',phone:'93904 66785',batchId:'b2',feeType:'monthly',feeAmount:2000},
+    {id:'s7',name:'Dinesh Kumar',phone:'92803 77896',batchId:'b3',feeType:'per-session',feeAmount:800},
+    {id:'s8',name:'Sunita Verma',phone:'91702 88907',batchId:'b3',feeType:'monthly',feeAmount:3000},
+    {id:'s9',name:'Vikram Singh',phone:'90601 99018',batchId:'b3',feeType:'monthly',feeAmount:3000},
+    {id:'s10',name:'Anita Desai',phone:'89500 10129',batchId:'b4',feeType:'monthly',feeAmount:1800},
+    {id:'s11',name:'Rajesh Iyer',phone:'88499 21230',batchId:'b4',feeType:'monthly',feeAmount:1800},
+    {id:'s12',name:'Pooja Shetty',phone:'87398 32341',batchId:'b4',feeType:'monthly',feeAmount:1800},
+  ];
+  S.payments=[
+    {id:'p1',studentId:'s1',amount:2500,date:'2026-03-01',note:'March'},
+    {id:'p2',studentId:'s2',amount:2500,date:'2026-03-02',note:'March'},
+    {id:'p3',studentId:'s4',amount:2000,date:'2026-03-01',note:'March'},
+    {id:'p4',studentId:'s5',amount:2000,date:'2026-03-03',note:'March'},
+    {id:'p5',studentId:'s7',amount:800,date:'2026-03-10',note:'Session'},
+    {id:'p6',studentId:'s8',amount:3000,date:'2026-03-01',note:'March'},
+    {id:'p7',studentId:'s10',amount:1800,date:'2026-03-01',note:'March'},
+    {id:'p8',studentId:'s11',amount:1800,date:'2026-03-02',note:'March'},
+  ];
+  save();
+}
+
+function getBatch(id){ return S.batches.find(b=>b.id===id)||{}; }
+function getPaid(sid){ return S.payments.filter(p=>p.studentId===sid).reduce((a,p)=>a+p.amount,0); }
+function initials(name){ return name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
+function avaColor(i){ return COLORS[i % COLORS.length]; }
+function avaBg(i){ return AVA_BG[i % AVA_BG.length]; }
+function fmt(n){ return '₹'+Math.round(n).toLocaleString('en-IN'); }
+
+/* ── NAV ── */
+function showPage(id, btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if(btn) btn.classList.add('active');
+  const renders = {dashboard:renderDash, batches:renderBatches, students:renderStudents, attendance:renderAttPage, fees:renderFees};
+  if(renders[id]) renders[id]();
+}
+
+/* ── MODAL ── */
+function openFab(){ openModal('fab'); }
+function openModal(type){
+  document.getElementById('modal-overlay').classList.add('open');
+  ['batch','student','pay','fab'].forEach(t=>{ document.getElementById('modal-'+t).style.display='none'; });
+  document.getElementById('modal-'+type).style.display='block';
+  const today = new Date().toISOString().split('T')[0];
+  if(type==='student'){
+    const sel = document.getElementById('s-batch');
+    sel.innerHTML = S.batches.map(b=>`<option value="${b.id}">${b.name}</option>`).join('');
+  }
+  if(type==='pay'){
+    const sel = document.getElementById('p-student');
+    sel.innerHTML = S.students.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+    document.getElementById('p-date').value = today;
+    const first = S.students[0];
+    if(first){ const bal=first.feeAmount-getPaid(first.id); document.getElementById('p-amount').value=Math.max(0,bal)||''; }
+  }
+}
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+  ['batch','student','pay','fab'].forEach(t=>{ document.getElementById('modal-'+t).style.display='none'; });
+}
+document.getElementById('p-student')?.addEventListener('change',function(){
+  const s=S.students.find(x=>x.id===this.value);
+  if(s){ document.getElementById('p-amount').value=Math.max(0,s.feeAmount-getPaid(s.id))||''; }
+});
+
+/* ── SAVE OPS ── */
+function saveBatch(){
+  const name=document.getElementById('b-name').value.trim();
+  if(!name) return toast('Enter a batch name','red');
+  S.batches.push({id:uid(),name,type:document.getElementById('b-type').value,time:document.getElementById('b-time').value,location:document.getElementById('b-loc').value.trim(),days:document.getElementById('b-days').value.trim(),capacity:parseInt(document.getElementById('b-cap').value)||10});
+  save(); closeModal(); renderBatches(); renderDash(); toast('Batch created!');
+}
+function saveStudent(){
+  const name=document.getElementById('s-name').value.trim();
+  if(!name) return toast('Enter a name','red');
+  S.students.push({id:uid(),name,phone:document.getElementById('s-phone').value.trim(),batchId:document.getElementById('s-batch').value,feeType:document.getElementById('s-fee-type').value,feeAmount:parseFloat(document.getElementById('s-fee').value)||0});
+  save(); closeModal(); renderStudents(); renderDash(); toast('Student added!');
+}
+function savePay(){
+  const sid=document.getElementById('p-student').value;
+  const amt=parseFloat(document.getElementById('p-amount').value);
+  if(!sid||!amt) return toast('Fill all fields','red');
+  S.payments.push({id:uid(),studentId:sid,amount:amt,date:document.getElementById('p-date').value,note:document.getElementById('p-note').value.trim()});
+  save(); closeModal(); renderFees(); renderDash(); toast('Payment recorded!');
+}
+function quickPay(sid){
+  openModal('pay');
+  setTimeout(()=>{ document.getElementById('p-student').value=sid; const s=S.students.find(x=>x.id===sid); if(s) document.getElementById('p-amount').value=Math.max(0,s.feeAmount-getPaid(sid))||''; },50);
+}
+
+/* ── TOAST ── */
+function toast(msg, type){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.background=type==='red'?'var(--red)':'var(--green)';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+/* ── DASHBOARD ── */
+function renderDash(){
+  const d=new Date();
+  document.getElementById('dash-date').textContent=d.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('m-students').textContent=S.students.length;
+  document.getElementById('m-batches').textContent=S.batches.length;
+  const totalFee=S.students.reduce((a,s)=>a+s.feeAmount,0);
+  const totalPaid=S.payments.reduce((a,p)=>a+p.amount,0);
+  const pending=Math.max(0,totalFee-totalPaid);
+  const pendingCount=S.students.filter(s=>getPaid(s.id)<s.feeAmount).length;
+  document.getElementById('m-collected').textContent=fmt(totalPaid);
+  document.getElementById('m-pending').textContent=fmt(pending);
+  document.getElementById('m-pending-sub').textContent=pendingCount+' students due';
+
+  const ts=document.getElementById('today-sessions');
+  ts.innerHTML = S.batches.length ? S.batches.map(b=>`
+    <div class="session-card">
+      <div class="session-time">${b.time}</div>
+      <div class="session-info">
+        <div class="session-name">${ICONS[b.type]||'📍'} ${b.name}</div>
+        <div class="session-loc">${b.location} · ${b.days}</div>
+      </div>
+      <span class="badge badge-accent">${S.students.filter(s=>s.batchId===b.id).length}</span>
+    </div>`).join('') : '<div class="empty"><div class="empty-title">No batches yet</div></div>';
+
+  const fa=document.getElementById('fee-alerts');
+  const overdue=S.students.filter(s=>getPaid(s.id)<s.feeAmount);
+  fa.innerHTML = overdue.length ? overdue.slice(0,5).map(s=>{
+    const bal=s.feeAmount-getPaid(s.id);
+    const batch=getBatch(s.batchId);
+    return `<div class="alert-row"><div><div class="alert-name">${s.name}</div><div class="alert-batch">${batch.name||'—'}</div></div><span class="badge badge-amber">${fmt(bal)} due</span></div>`;
+  }).join('')+(overdue.length>5?`<div style="font-size:12px;color:var(--text3);padding:10px 0">+${overdue.length-5} more</div>`:'')
+  : '<div style="padding:12px 0;font-size:13px;color:var(--green)">✓ All fees collected</div>';
+}
+
+/* ── BATCHES ── */
+function renderBatches(){
+  const el=document.getElementById('batch-list');
+  if(!S.batches.length){ el.innerHTML='<div class="empty"><div class="empty-icon">📍</div><div class="empty-title">No batches yet</div><div>Tap + to add your first</div></div>'; return; }
+  el.innerHTML=S.batches.map((b,i)=>{
+    const count=S.students.filter(s=>s.batchId===b.id).length;
+    const pct=b.capacity?Math.min(100,Math.round(count/b.capacity*100)):0;
+    return `<div class="batch-card">
+      <div class="batch-card-top">
+        <div class="batch-icon" style="background:${avaBg(i)}">${ICONS[b.type]||'📍'}</div>
+        <div style="flex:1">
+          <div class="batch-name">${b.name}</div>
+          <div class="batch-loc">📍 ${b.location}</div>
+        </div>
+        <span class="badge badge-accent">${count} students</span>
+      </div>
+      <div class="batch-meta">
+        <span class="meta-chip">⏰ ${b.time}</span>
+        <span class="meta-chip">${b.days}</span>
+        <span class="meta-chip">Max ${b.capacity}</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${avaColor(i)}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+/* ── STUDENTS ── */
+function renderStudents(){
+  const filter=document.getElementById('student-filter');
+  filter.innerHTML='<option value="">All batches</option>'+S.batches.map(b=>`<option value="${b.id}">${b.name}</option>`).join('');
+  filterStudents();
+}
+function filterStudents(){
+  const bId=document.getElementById('student-filter').value;
+  const list=bId?S.students.filter(s=>s.batchId===bId):S.students;
+  document.getElementById('students-sub').textContent=list.length+' students';
+  const el=document.getElementById('students-list');
+  if(!list.length){ el.innerHTML='<div class="empty" style="padding:24px"><div class="empty-title">No students</div></div>'; return; }
+  el.innerHTML=list.map((s,i)=>{
+    const paid=getPaid(s.id);
+    const bal=s.feeAmount-paid;
+    const badge=bal<=0?'<span class="badge badge-green">Paid</span>':paid>0?'<span class="badge badge-amber">Partial</span>':'<span class="badge badge-red">Due</span>';
+    const batch=getBatch(s.batchId);
+    return `<div class="student-row">
+      <div class="ava" style="background:${avaBg(i)};color:${avaColor(i)}">${initials(s.name)}</div>
+      <div class="student-info">
+        <div class="student-name">${s.name}</div>
+        <div class="student-detail">${batch.name||'—'} · ${s.phone}</div>
+      </div>
+      <div class="student-fee">
+        ${badge}
+        <div class="fee-label" style="margin-top:4px">${fmt(s.feeAmount)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── ATTENDANCE ── */
+function renderAttPage(){
+  const sel=document.getElementById('att-batch');
+  sel.innerHTML='<option value="">Select batch...</option>'+S.batches.map(b=>`<option value="${b.id}">${b.name}</option>`).join('');
+  document.getElementById('att-date').value=new Date().toISOString().split('T')[0];
+  renderAttGrid();
+}
+function renderAttGrid(){
+  const bId=document.getElementById('att-batch').value;
+  const date=document.getElementById('att-date').value;
+  const grid=document.getElementById('att-grid');
+  const sumEl=document.getElementById('att-summary');
+  if(!bId){ grid.innerHTML='<div class="empty"><div class="empty-icon">✅</div><div class="empty-title">Select a batch above</div></div>'; sumEl.style.display='none'; return; }
+  const students=S.students.filter(s=>s.batchId===bId);
+  if(!students.length){ grid.innerHTML='<div class="empty"><div class="empty-title">No students in this batch</div></div>'; sumEl.style.display='none'; return; }
+  const key=bId+'_'+date;
+  if(!attState[key]) attState[key]={};
+  const present=Object.values(attState[key]).filter(v=>v==='present').length;
+  sumEl.style.display='block';
+  sumEl.textContent=`${present} present · ${students.length-present} not marked`;
+  grid.innerHTML=students.map((s,i)=>{
+    const st=attState[key]&&attState[key][s.id];
+    const cls=st==='present'?'present':st==='absent'?'absent':'';
+    const icon=st==='present'?'✓':st==='absent'?'✕':'';
+    return `<div class="att-student ${cls}" onclick="toggleAtt('${s.id}','${key}')">
+      <div class="ava" style="width:34px;height:34px;font-size:12px;background:${avaBg(i)};color:${avaColor(i)}">${initials(s.name)}</div>
+      <div style="flex:1"><div style="font-size:14px;font-weight:600">${s.name}</div><div style="font-size:11px;color:var(--text3);margin-top:1px">${s.phone}</div></div>
+      <div class="att-toggle">${icon}</div>
+    </div>`;
+  }).join('');
+}
+function toggleAtt(sid,key){
+  if(!attState[key]) attState[key]={};
+  const cur=attState[key][sid];
+  attState[key][sid]=cur==='present'?'absent':'present';
+  renderAttGrid();
+}
+function saveAtt(){
+  const bId=document.getElementById('att-batch').value;
+  const date=document.getElementById('att-date').value;
+  if(!bId||!date){ toast('Select batch and date','red'); return; }
+  const key=bId+'_'+date;
+  if(!S.attendance) S.attendance={};
+  S.attendance[key]=attState[key]||{};
+  save(); toast('Attendance saved!');
+}
+
+/* ── FEES ── */
+function renderFees(){
+  const totalFee=S.students.reduce((a,s)=>a+s.feeAmount,0);
+  const totalPaid=S.payments.reduce((a,p)=>a+p.amount,0);
+  document.getElementById('f-collected').textContent=fmt(totalPaid);
+  document.getElementById('f-pending').textContent=fmt(Math.max(0,totalFee-totalPaid));
+  document.getElementById('f-total').textContent=fmt(totalFee);
+  const el=document.getElementById('fees-list');
+  if(!S.students.length){ el.innerHTML='<div class="empty"><div class="empty-title">No students yet</div></div>'; return; }
+  const sorted=[...S.students].sort((a,b)=>{
+    const balA=a.feeAmount-getPaid(a.id), balB=b.feeAmount-getPaid(b.id);
+    return balB-balA;
+  });
+  el.innerHTML=sorted.map((s,i)=>{
+    const paid=getPaid(s.id);
+    const bal=s.feeAmount-paid;
+    const pct=s.feeAmount>0?Math.min(100,Math.round(paid/s.feeAmount*100)):0;
+    const batch=getBatch(s.batchId);
+    const statusColor=bal<=0?'var(--green)':bal<s.feeAmount?'var(--amber)':'var(--red)';
+    return `<div class="fee-row">
+      <div class="ava" style="width:36px;height:36px;font-size:12px;flex-shrink:0;background:${avaBg(i)};color:${avaColor(i)}">${initials(s.name)}</div>
+      <div class="fee-info">
+        <div class="fee-name">${s.name}</div>
+        <div class="fee-batch">${batch.name||'—'}</div>
+        <div class="progress-bar" style="margin-top:6px;width:100px"><div class="progress-fill" style="width:${pct}%;background:${statusColor}"></div></div>
+      </div>
+      <div class="fee-right">
+        <div class="fee-balance" style="color:${statusColor}">${bal<=0?'Paid':fmt(bal)}</div>
+        ${bal>0?`<button class="btn btn-sm" style="margin-top:5px;background:var(--accent-glow);color:var(--accent2);border:1px solid var(--accent);font-size:11px;padding:4px 10px;" onclick="quickPay('${s.id}')">Collect</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// bootstrap
+load();
+initSeed();
+renderDash();
+
+// attach p-student change
+document.getElementById('p-student').addEventListener('change',function(){
+  const s=S.students.find(x=>x.id===this.value);
+  if(s){ document.getElementById('p-amount').value=Math.max(0,s.feeAmount-getPaid(s.id))||''; }
+});
+</script>
+</body>
+</html>
